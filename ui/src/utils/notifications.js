@@ -3,7 +3,8 @@ export const sendNotification = (title, body = '', image = '') => {
   new Notification(title, {
     body: body,
     icon: image,
-    silent: true,
+    silent: false,
+    tag: 'Navidrome',
   })
 }
 
