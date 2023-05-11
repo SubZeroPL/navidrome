@@ -1,9 +1,10 @@
 export const sendNotification = (title, body = '', image = '') => {
-  checkForNotificationPermission()
+  if (!checkForNotificationPermission())
+    return;
   new Notification(title, {
     body: body,
     icon: image,
-    silent: false,
+    silent: true,
     tag: 'Navidrome',
   })
 }
