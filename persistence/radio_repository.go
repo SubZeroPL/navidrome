@@ -10,12 +10,12 @@ import (
 	"time"
 
 	. "github.com/Masterminds/squirrel"
-	"github.com/beego/beego/v2/client/orm"
 	"github.com/deluan/rest"
 	"github.com/google/uuid"
 	"github.com/navidrome/navidrome/consts"
 	"github.com/navidrome/navidrome/log"
 	"github.com/navidrome/navidrome/model"
+	"github.com/pocketbase/dbx"
 )
 
 type httpDoer interface {
@@ -28,10 +28,10 @@ type radioRepository struct {
 	client httpDoer
 }
 
-func NewRadioRepository(ctx context.Context, o orm.QueryExecutor) model.RadioRepository {
+func NewRadioRepository(ctx context.Context, db dbx.Builder) model.RadioRepository {
 	r := &radioRepository{}
 	r.ctx = ctx
-	r.ormer = o
+	r.db = db
 	r.tableName = "radio"
 	r.filterMappings = map[string]filterFunc{
 		"name": containsFilter,
@@ -48,7 +48,7 @@ func (r *radioRepository) isPermitted() bool {
 }
 
 func (r *radioRepository) CountAll(options ...model.QueryOptions) (int64, error) {
-	sql := r.newSelect(options...)
+	sql := r.newSelect()
 	return r.count(sql, options...)
 }
 
@@ -105,9 +105,9 @@ func (r *radioRepository) Put(radio *model.Radio) error {
 	if radio.ID == "" {
 		radio.CreatedAt = time.Now()
 		radio.ID = strings.ReplaceAll(uuid.NewString(), "-", "")
-		values, _ = toSqlArgs(*radio)
+		values, _ = toSQLArgs(*radio)
 	} else {
-		values, _ = toSqlArgs(*radio)
+		values, _ = toSQLArgs(*radio)
 		update := Update(r.tableName).Where(Eq{"id": radio.ID}).SetMap(values)
 
 		count, err := r.executeSQL(update)

@@ -8,7 +8,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/beego/beego/v2/client/orm"
 	"github.com/deluan/rest"
 	"github.com/navidrome/navidrome/log"
 	"github.com/navidrome/navidrome/model"
@@ -53,8 +52,8 @@ var _ = Describe("RadioRepository", func() {
 
 			ctx := log.NewContext(context.TODO())
 			ctx = request.WithUser(ctx, model.User{ID: "userid", UserName: "userid", IsAdmin: true})
-			repo = NewRadioRepository(ctx, orm.NewOrm())
-			repo.(*radioRepository).client = httpClient
+			repo = NewRadioRepository(ctx, getDBXBuilder())
+			_ = repo.Put(&radioWithHomePage)
 		})
 
 		AfterEach(func() {
@@ -255,7 +254,7 @@ var _ = Describe("RadioRepository", func() {
 		BeforeEach(func() {
 			ctx := log.NewContext(context.TODO())
 			ctx = request.WithUser(ctx, model.User{ID: "userid", UserName: "userid", IsAdmin: false})
-			repo = NewRadioRepository(ctx, orm.NewOrm())
+			repo = NewRadioRepository(ctx, getDBXBuilder())
 		})
 
 		Describe("Count", func() {
